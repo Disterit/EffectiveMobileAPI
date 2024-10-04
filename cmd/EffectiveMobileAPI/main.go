@@ -1,8 +1,13 @@
 package main
 
 import (
+	"EffectiveMobileAPI/internal/api"
 	"EffectiveMobileAPI/internal/config"
+	"EffectiveMobileAPI/internal/storage"
+	"EffectiveMobileAPI/internal/storage/postgres"
+	"github.com/go-chi/chi"
 	"log/slog"
+	"net/http"
 	"os"
 )
 
@@ -19,6 +24,18 @@ func main() {
 
 	log.Info("starting api", slog.String("key", cfg.Env))
 	log.Debug("debug message enable")
+
+	db := storage.Connection(log)
+	router := chi.NewRouter()
+
+	storageDB := postgres.NewStorage(db)
+
+	router.Post("/EffectiveMobile/AddSong", api.AddSongHandler(log, storageDB))
+
+	err := http.ListenAndServe(cfg.Address, router)
+	if err != nil {
+		log.Error("Error starting server", err)
+	}
 
 }
 

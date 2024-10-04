@@ -4,26 +4,27 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"os"
+	"time"
 )
 
 type Config struct {
 	Env        string `yaml:"env" env-default:"local"`
-	Database   `yaml:"database"`
+	Database   `yaml:"db"`
 	HttpServer `yaml:"HttpServer"`
 }
 
 type Database struct {
 	Host     string `yaml:"host" env-default:"db"`
-	user     string `yaml:"user" env-default:"postgres"`
-	password string `yaml:"password" env-default:"postgres"`
-	port     string `yaml:"port" env-default:"5432"`
-	dbname   string `yaml:"dbname" env-default:"EffectiveMobileAPI"`
+	User     string `yaml:"user" env-default:"postgres"`
+	Password string `yaml:"password" env-default:"postgres"`
+	Port     int    `yaml:"port" env-default:"5432"`
+	Dbname   string `yaml:"dbname" env-default:"EffectiveMobileAPI"`
 }
 
 type HttpServer struct {
-	Port        string `yaml:"port" env-default:"8080"`
-	Timeout     int    `yaml:"timeout" env-default:"4"`
-	IdleTimeout int    `yaml:"idleTimeout" env-default:"60"`
+	Address     string        `yaml:"address" env-default:"8080"`
+	Timeout     time.Duration `yaml:"timeout" env-default:"4"`
+	IdleTimeout time.Duration `yaml:"idle_timeout" env-default:"60"`
 }
 
 func MustLoad() *Config {
