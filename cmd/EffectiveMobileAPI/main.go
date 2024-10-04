@@ -31,6 +31,7 @@ func main() {
 	storageDB := postgres.NewStorage(db)
 
 	router.Post("/EffectiveMobile/AddSong", api.AddSongHandler(log, storageDB))
+	router.Post("/EffectiveMobile/ChangeInfo", api.ChangeInfoSongHandler(log, storageDB))
 
 	err := http.ListenAndServe(cfg.Address, router)
 	if err != nil {

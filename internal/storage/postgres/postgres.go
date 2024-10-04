@@ -14,9 +14,9 @@ type Song struct {
 }
 
 type InfoSong struct {
-	ReleaseDate time.Time `json:"releaseDate"`
-	Text        string    `json:"text"`
-	Link        string    `json:"link"`
+	ReleaseDate *time.Time `json:"releaseDate"`
+	Text        string     `json:"text"`
+	Link        string     `json:"link"`
 }
 
 type Storage struct {
@@ -31,11 +31,43 @@ func (s *Storage) AddSong(song Song, log *slog.Logger) (int, error) {
 
 	const op = "storage.postgres.AddSong()"
 
-	query := `INSERT INTO song (name, music_group) VALUES ($1, $2)`
+	query := `INSERT INTO song (name, music_group) VALUES ($1, $2) returning id`
 
-	_, err := s.db.Exec(query, song.Name, song.Group)
+	var id int
+
+	err := s.db.QueryRow(query, song.Name, song.Group).Scan(&id)
 	if err != nil {
 		log.Error("Error to insert", op)
+		return http.StatusBadRequest, err
+	}
+
+	query = `INSERT INTO infosong (id_song) VALUES ($1)`
+
+	_, err = s.db.Exec(query, id)
+	if err != nil {
+		log.Error("Error to insert", op)
+		return http.StatusBadRequest, err
+	}
+
+	return http.StatusOK, nil
+}
+
+func (s *Storage) ChangeInfo(id int, info InfoSong, log *slog.Logger) (int, error) {
+
+	const op = "storage.postgres.AddInfo()"
+
+	query := `
+		UPDATE InfoSong
+		SET 
+		    releaseDate = COALESCE($1, releaseDate),
+		    text = COALESCE($2, text),
+		    link = COALESCE($3, link)
+		WHERE id_song = $4;
+	`
+
+	_, err := s.db.Exec(query, info.ReleaseDate, info.Text, info.Link, id)
+	if err != nil {
+		log.Error("Error to update", op)
 		return http.StatusBadRequest, err
 	}
 
