@@ -29,6 +29,7 @@ func main() {
 	router := chi.NewRouter()
 
 	storageDB := postgres.NewStorage(db)
+	log.Info("db connection successful")
 
 	router.Post("/EffectiveMobile/AddSong", api.AddSongHandler(log, storageDB))
 	router.Post("/EffectiveMobile/ChangeInfo", api.ChangeInfoSongHandler(log, storageDB))

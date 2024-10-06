@@ -1,10 +1,10 @@
 env: "local"
 db:
-  host: "localhost" # db
+  host: "db" # db
   user: "postgres"
   password: "postgres"
   port: 5432
-  dbname: "demo" # EffectiveMobileAPI
+  dbname: "db" #db
 HttpServer:
   address: "0.0.0.0:8081"
   timeout: 4s

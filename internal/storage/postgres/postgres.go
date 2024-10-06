@@ -149,7 +149,7 @@ func (s *Storage) GetInfo(name, group string, log *slog.Logger) (InfoSong, error
 
 	const op = "storage.postgres.GetInfo()"
 
-	query := `SELECT text, releasedate, link FROM info WHERE music_group = $1 AND name = $2;`
+	query := `SELECT text, releasedate, link FROM Library WHERE music_group = $1 AND name = $2;`
 
 	var infoSong InfoSong
 
