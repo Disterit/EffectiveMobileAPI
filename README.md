@@ -6,7 +6,7 @@ EffectiveMobileAPI — это RESTful API для управления музык
 - [Особенности](#особенности)
 - [Технологии](#технологии)
 - [Начало работы](#начало-работы)
-- [Настройка](#настройка)
+- [Установка](#установка)
 - [API Эндпоинты](#api-эндпоинты)
 - [Обработка ошибок](#обработка-ошибок)
 - [Лицензия](#лицензия)
@@ -41,3 +41,64 @@ EffectiveMobileAPI — это RESTful API для управления музык
    ```bash
    git clone https://github.com/yourusername/EffectiveMobileAPI.git
    cd EffectiveMobileAPI
+
+2. Запуск приложения:
+   ```bash
+   docker-compose up
+   docker-compose exec db psql -U postgres
+   CREATE DATABASE db;
+
+## API Эндпоинты
+
+1. **Add song**
+   - **Endpoint:** `POST /EffectiveMobile/AddSong`
+   - **Тело запроса:** JSON-объект, содержащий:
+     - `song`: Название песни
+     - `group`: Имя артиста/музыкальной группы
+   - **Ответ:** 
+     - `200 OK` при успешном добавлении песни
+     - `400 Bad Request`, если ошибка запроса
+     - `500 Status Internal Server`, ошибка базы данных
+
+2. **Change info**
+   - **Эндпоинт:** `POST /EffectiveMobile/ChangeInfo?id=*`
+   - **Ответ:** 
+     - `200 OK` при изменении данных у песни
+     - `400 Bad Request`, ошибка запроса
+     - `500 Status Internal Server`, ошибка базы данных
+
+3. **Delete song**
+   - **Эндпоинт:** `DELETE /EffectiveMobile/DeleteSong?id=*`
+   - **Ответ:** 
+     - `200 OK` при удачном удалении песни
+     - `400 Bad Request`, ошибка запроса
+     - `500 Status Internal Server`, ошибка базы данных
+
+4. **Text song**
+   - **Эндпоинт:** `GET /EffectiveMobile/TextSong?id=3`
+   - **Ответ:** 
+     - `200 OK` при успешном получении текста
+     - `400 Bad Request`, ошибка запроса
+     - `500 Status Internal Server`, ошибка базы данных
+   
+5. **Library(наших песен)**
+   - **Эндпоинт:** `GET /EffectiveMobile/Library`
+   - **Ответ:** 
+     - `200 OK` при успешном получении всех данных песен
+     - `400 Bad Request`, ошибка запроса
+     - `500 Status Internal Server`, ошибка базы данных
+
+6. **Library(наших песен)**
+   - **Эндпоинт:** `GET /EffectiveMobile/info?group=*&song=*`
+   - **Ответ:** 
+     - `200 OK` при получении дополнительных сведениях о песни
+     - `400 Bad Request`, ошибка запроса
+     - `500 Status Internal Server`, ошибка базы данных
+    
+7. **Library(всез песен в библиотеки)**
+- **Эндпоинт:** `GET /Library`
+- **Ответ:** 
+  - `200 OK` при успешном получении всех данных песен
+  - `400 Bad Request`, ошибка запроса
+  - `500 Status Internal Server`, ошибка базы данных
+
