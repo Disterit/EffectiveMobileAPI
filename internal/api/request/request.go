@@ -6,19 +6,23 @@ const (
 	InternalServerReq = "Internal Server Error"
 )
 
-type Request struct {
+type OkResponse struct {
+	Description string `json:"description"`
+}
+
+type ErrorResponse struct {
 	Description string `json:"description"`
 	Error       string `json:"error"`
 }
 
-func Ok() *Request {
-	return &Request{Description: OkReq, Error: ""}
+func Ok() *OkResponse {
+	return &OkResponse{Description: OkReq}
 }
 
-func BadRequest(Err string) *Request {
-	return &Request{Description: badReq, Error: Err}
+func BadRequest(err string) *ErrorResponse {
+	return &ErrorResponse{Description: badReq, Error: err}
 }
 
-func InternalServer(Err string) *Request {
-	return &Request{Description: InternalServerReq, Error: Err}
+func InternalServer(err string) *ErrorResponse {
+	return &ErrorResponse{Description: InternalServerReq, Error: err}
 }

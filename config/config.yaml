@@ -1,10 +1,10 @@
 env: "local"
 db:
-  host: "db" # db
+  host: "localhost" # db
   user: "postgres"
   password: "postgres"
   port: 5432
-  dbname: "db" #db
+  dbname: "demo" #db
 HttpServer:
   address: "0.0.0.0:8081"
   timeout: 4s

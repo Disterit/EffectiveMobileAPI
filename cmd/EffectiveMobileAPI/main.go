@@ -5,7 +5,9 @@ import (
 	"EffectiveMobileAPI/internal/config"
 	"EffectiveMobileAPI/internal/storage"
 	"EffectiveMobileAPI/internal/storage/postgres"
+	"EffectiveMobileAPI/internal/swager"
 	"github.com/go-chi/chi"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"log/slog"
 	"net/http"
 	"os"
@@ -31,12 +33,20 @@ func main() {
 	storageDB := postgres.NewStorage(db)
 	log.Info("db connection successful")
 
+	storageDB.CreateTable(log)
+	//storageDB.MigrateLibrary(log)
+
+	swager.InitRoutes(router, log, storageDB)
+
+	router.Mount("/swagger", httpSwagger.WrapHandler)
+
 	router.Post("/EffectiveMobile/AddSong", api.AddSongHandler(log, storageDB))
 	router.Post("/EffectiveMobile/ChangeInfo", api.ChangeInfoSongHandler(log, storageDB))
 	router.Delete("/EffectiveMobile/DeleteSong", api.DeleteSongHandler(log, storageDB))
 	router.Get("/EffectiveMobile/TextSong", api.TextSongHandler(log, storageDB))
 	router.Get("/EffectiveMobile/Library", api.LibraryHandler(log, storageDB))
 
+	router.Get("/Library", api.LibraryMainHandler(log, storageDB))
 	router.Get("/info", api.InfoHandler(log, storageDB))
 
 	err := http.ListenAndServe(cfg.Address, router)

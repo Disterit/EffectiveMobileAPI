@@ -3,10 +3,9 @@ services:
     build: .
     ports:
       - "8081:8081"
-    volumes:
-      - ./config.yaml:/app/config.yaml
     environment:
       - CONFIG_PATH=config/config.yaml
+      - INIT_PATH=internal/storage/init/init.sql
       - POSTGRES_HOST_AUTH_METHOD=trust
     depends_on:
       - db
