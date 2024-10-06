@@ -1,14 +1,63 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-//TIP To run your code, right-click the code and select <b>Run</b>. Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.
+func formatSongLyrics(lyrics string) string {
+	// Замена одинарных кавычек на двойные
+	lyrics = strings.ReplaceAll(lyrics, "'", "''")
 
-func main() {
+	// Разделяем текст на строки
+	lines := strings.Split(lyrics, "\n")
 
-	fmt.Println(len("https://www.youtube.com/watch?v=J9mdMypRkw4"))
+	var formattedLyrics strings.Builder
+
+	for i, line := range lines {
+		// Добавляем строку и перенос строки
+		formattedLyrics.WriteString(line + "\\n")
+
+		// Если текущая строка пустая, добавляем дополнительный перенос
+		if line == "" && i != len(lines)-1 {
+			formattedLyrics.WriteString("\\n")
+		}
+	}
+
+	return formattedLyrics.String()
 }
 
-//TIP See GoLand help at <a href="https://www.jetbrains.com/help/go/">jetbrains.com/help/go/</a>.
-// Also, you can try interactive lessons for GoLand by selecting 'Help | Learn IDE Features' from the main menu.
+func main() {
+	lyrics := `Лунный лик, она не спит, я проник в её мозги-ги
+Но что я знаю о любви? Прибереги для других-их
+Я всё чаще вижу сны, но тебя не помню в них
+Я борюсь, иду на риск, что-то тянет меня вниз
+Лунный лик, она не спит, я проник в её мозги-ги
+Но что я знаю о любви? Прибереги для других-их
+Я всё чаще вижу сны, но тебя не помню в них
+Я борюсь, иду на риск, что-то тянет меня вниз
+
+Как я свеж, о мой Бог, сделал то, что ты не смог
+Рэп и кэш на мой моб, пачки в небо, drag and drop
+Детка, перелей в себя всю мою кровь
+Я высоко, мы не встретимся вновь
+Ты не найдёшь покой, пытаясь быть мной
+Забери на выбор: боль или любовь
+Следы замёл иней, мы так далеко
+Тёплый ветер напомнит аромат её
+Как делили те ночи вдвоём напролёт
+Она так горяча, на ней горит бельё
+На ней моя печать, внутри меня печаль
+Что она означает? Давай не будем прощаться
+Жаль, жаль, просто не выпало шанса
+Лунный свет с неба, мыслей лабиринт (Мыслей лабиринт; я, я, я)
+На бегу за мечтой, начинал на мели (—чинал на мели; я, я)
+Мой путь млечный, но мой свет внутри (Но мой свет внутри; я)
+Детка, ты нечто, но ничто не вечно`
+
+	// Форматируем текст
+	formattedLyrics := formatSongLyrics(lyrics)
+
+	// Выводим отформатированный текст
+	fmt.Println(formattedLyrics)
+}

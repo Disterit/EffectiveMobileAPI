@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+type Library struct {
+	Songs Songs `json:"songs"`
+}
+
+type Songs struct {
+	Song     Song     `json:"song"`
+	InfoSong InfoSong `json:"info_song"`
+}
+
 type Song struct {
 	Group string `json:"group"`
 	Name  string `json:"song"`
@@ -28,7 +37,6 @@ func NewStorage(db *sql.DB) *Storage {
 }
 
 func (s *Storage) AddSong(song Song, log *slog.Logger) (int, error) {
-
 	const op = "storage.postgres.AddSong()"
 
 	query := `INSERT INTO song (name, music_group) VALUES ($1, $2) returning id`
@@ -49,11 +57,10 @@ func (s *Storage) AddSong(song Song, log *slog.Logger) (int, error) {
 		return http.StatusBadRequest, err
 	}
 
-	return http.StatusOK, nil
+	return id, nil
 }
 
 func (s *Storage) ChangeInfo(id int, info InfoSong, log *slog.Logger) (int, error) {
-
 	const op = "storage.postgres.AddInfo()"
 
 	query := `
@@ -72,4 +79,95 @@ func (s *Storage) ChangeInfo(id int, info InfoSong, log *slog.Logger) (int, erro
 	}
 
 	return http.StatusOK, nil
+}
+
+func (s *Storage) DeleteSong(id int, log *slog.Logger) (sql.Result, error) {
+	const op = "storage.postgres.DeleteInfo()"
+
+	query := `DELETE FROM Song WHERE id = $1;`
+
+	res, err := s.db.Exec(query, id)
+	if err != nil {
+		log.Error("Error to delete", op)
+	}
+
+	return res, nil
+}
+
+func (s *Storage) GetText(id int, log *slog.Logger) (string, error) {
+	const op = "storage.postgres.GetText()"
+
+	query := `SELECT text FROM infosong WHERE id_song = $1;`
+
+	var text string
+
+	err := s.db.QueryRow(query, id).Scan(&text)
+	if err != nil {
+		log.Error("Error to get song text", op)
+	}
+
+	return text, err
+}
+
+func (s *Storage) GetLibrary(log *slog.Logger) ([]Library, error) {
+
+	const op = "storage.postgres.GetLibrary()"
+
+	query := `SELECT s.id, s.music_group, s.name, i.text, i.releasedate, i.link
+				FROM song s
+				JOIN infosong i ON s.id = i.id_song;
+				`
+
+	var library []Library
+
+	rows, err := s.db.Query(query)
+	if err != nil {
+		log.Error("Error to get songs", op)
+	}
+
+	for rows.Next() {
+		var lib Library
+		var id int64
+		err = rows.Scan(&id,
+			&lib.Songs.Song.Group,
+			&lib.Songs.Song.Name,
+			&lib.Songs.InfoSong.Text,
+			&lib.Songs.InfoSong.ReleaseDate,
+			&lib.Songs.InfoSong.Link)
+		if err != nil {
+			log.Error("Error to get songs", op)
+			return nil, err
+		}
+
+		library = append(library, lib)
+	}
+
+	return library, nil
+}
+
+func (s *Storage) GetInfo(name, group string, log *slog.Logger) (InfoSong, error) {
+
+	const op = "storage.postgres.GetInfo()"
+
+	query := `SELECT text, releasedate, link FROM info WHERE music_group = $1 AND name = $2;`
+
+	var infoSong InfoSong
+
+	rows, err := s.db.Query(query, name, group)
+
+	if err != nil {
+		log.Error("Error to get songs", op)
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&infoSong.Text,
+			&infoSong.ReleaseDate,
+			&infoSong.Link)
+		if err != nil {
+			log.Error("Error to get songs", op)
+			return InfoSong{}, err
+		}
+	}
+
+	return infoSong, nil
 }
