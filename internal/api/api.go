@@ -9,6 +9,7 @@ import (
 	"github.com/lib/pq"
 	"log/slog"
 	"net/http"
+	url2 "net/url"
 	"strconv"
 )
 
@@ -27,12 +28,19 @@ func AddSongHandler(log *slog.Logger, storage *postgres.Storage) http.HandlerFun
 			return
 		}
 
-		url := fmt.Sprintf("http://0.0.0.0:8081/info?group=%s&song=%s", song.Group, song.Name)
+		url := fmt.Sprintf("http://0.0.0.0:8081/info?group=%s&song=%s", url2.QueryEscape(song.Group), url2.QueryEscape(song.Name))
 		infoSong, err := response.GetInfoSong(log, url)
 		if err != nil {
 			log.Error("Error getting info song in library", "error", err, "operation", op)
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(request.BadRequest("Error decoding request body"))
+			return
+		}
+
+		if infoSong.ReleaseDate == nil {
+			log.Error("Error library don't have this song", "error", err, "operation", op)
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(request.BadRequest("Error library don't have this song"))
 			return
 		}
 
@@ -54,6 +62,8 @@ func AddSongHandler(log *slog.Logger, storage *postgres.Storage) http.HandlerFun
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(request.Ok())
+		log.Info("song successfully added")
+		return
 	}
 }
 
@@ -88,6 +98,8 @@ func ChangeInfoSongHandler(log *slog.Logger, storage *postgres.Storage) http.Han
 
 		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(request.Ok())
+		log.Info("song successfully changed")
+		return
 	}
 }
 
@@ -120,6 +132,8 @@ func DeleteSongHandler(log *slog.Logger, storage *postgres.Storage) http.Handler
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(request.Ok())
+		log.Info("song successfully deleted")
+		return
 	}
 }
 
@@ -144,6 +158,8 @@ func TextSongHandler(log *slog.Logger, storage *postgres.Storage) http.HandlerFu
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(text)
+		log.Info("lyrics of the song successfully received")
+		return
 	}
 }
 
@@ -162,6 +178,7 @@ func LibraryHandler(log *slog.Logger, storage *postgres.Storage) http.HandlerFun
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(library)
 		w.WriteHeader(http.StatusOK)
+		log.Info("library successfully received")
 	}
 }
 
@@ -182,6 +199,7 @@ func InfoHandler(log *slog.Logger, storage *postgres.Storage) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(info)
-
+		log.Info("info successfully received")
+		return
 	}
 }
