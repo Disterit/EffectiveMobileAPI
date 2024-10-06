@@ -34,7 +34,7 @@ func main() {
 	log.Info("db connection successful")
 
 	storageDB.CreateTable(log)
-	//storageDB.MigrateLibrary(log)
+	storageDB.MigrateLibrary(log)
 
 	swager.InitRoutes(router, log, storageDB)
 
@@ -45,9 +45,9 @@ func main() {
 	router.Delete("/EffectiveMobile/DeleteSong", api.DeleteSongHandler(log, storageDB))
 	router.Get("/EffectiveMobile/TextSong", api.TextSongHandler(log, storageDB))
 	router.Get("/EffectiveMobile/Library", api.LibraryHandler(log, storageDB))
+	router.Get("/EffectiveMobile/info", api.InfoHandler(log, storageDB))
 
 	router.Get("/Library", api.LibraryMainHandler(log, storageDB))
-	router.Get("/info", api.InfoHandler(log, storageDB))
 
 	err := http.ListenAndServe(cfg.Address, router)
 	if err != nil {
