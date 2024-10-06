@@ -46,6 +46,7 @@ EffectiveMobileAPI — это RESTful API для управления музык
    docker-compose up
    docker-compose exec db psql -U postgres
    CREATE DATABASE db;
+   docker-compose up --build
 
 ## API Эндпоинты
 
